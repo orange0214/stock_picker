@@ -1,9 +1,11 @@
 B2 Portfolio for 2008
-$FISV: Fiserv, Inc., 0.53
-$HOLX: Hologic, 0.32
-$TEVA: Teva Pharmaceutical Industries, 0.31
-$ORCL: Oracle Corp., 0.09
-$ADBE: Adobe Systems Inc., 0.07
-$AAPL: Apple Inc., 0.03
-$EBAY: eBay Inc., 0.02
-$MSFT: Microsoft Corp., 0.02
+$BBBY: Bed Bath & Beyond Inc., 0.00
+$BIDU: Baidu.com, Inc., 0.00
+$CMCSA: Comcast Corp. Class A Common, 0.00
+$EBAY: eBay Inc., 0.00
+$EXPE: Expedia, Inc., 0.00
+$GOOGL: Google Inc. Class A, 0.00
+$KLAC: KLA-Tencor Corp., 0.00
+$LAMR: Lamar Advertising Co., 0.00
+$VRSN: VeriSign, 0.00
+$VRTX: Vertex Pharmaceuticals, 0.00

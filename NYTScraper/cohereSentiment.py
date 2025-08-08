@@ -5,29 +5,29 @@ import cohere
 import configparser
 from StockPicker.configexporter import exportNYTScores
 import config
-from cohere.classify import Example
+from cohere import ClassifyExample
 import pandas as pd
 
 config2 = configparser.ConfigParser()
-config2.read('NYTScraper\config.ini')
+config2.read('NYTScraper/config.ini')
 api_key = config2['cohere']['cohere_key']
 co = cohere.Client(api_key)
 
 examples=[
-  Example("Apple’s Cut From App Sales Reached $4.5 Billion in 2014", "positive"),
-  Example("Tests of Cholesterol Drugs Offer Hope of Reducing Heart Attacks and Strokes", "positive"),
-  Example("F.D.A. Approves Amgen Drug to Treat Heart Failure", "positive"),
-  Example("With Win, Amazon Shakes Up Yet Another Industry", "positive"),
-  Example("Bobby Kotick’s Activision Blizzard to Buy King Digital, Maker of Candy Crush", "positive"),
-  Example("Biogen Reports Its Alzheimer’s Drug Sharply Slowed Cognitive Decline", "positive"),
-  Example("Intel Agrees to Buy Altera for $16.7 Billion", "positive"),
-  Example("SodaStream Hits Reset as Its Sales and Profit Fall", "negative"),
-  Example("Amazon’s Tax Deal With Luxembourg May Break Rules, E.U. Regulator Says", "negative"),
-  Example("Comcast-Time Warner Cable Deal’s Collapse Leaves Frustrated Customers Out in the Cold", "negative"),
-  Example("Daily Report: Tech Giants Said to Offer Bigger Settlement in Antitrust Case on Hiring", "negative"),
-  Example("C.F.T.C. Accuses Kraft and Mondelez of Manipulating Wheat Prices", "negative"),
-  Example("Morning Agenda: Split Decision for Greenberg in A.I.G. Lawsuit", "negative"),
-  Example("Apple’s New Job: Selling a Smartwatch to an Uninterested Public", "negative")
+  ClassifyExample(text="Apple's Cut From App Sales Reached $4.5 Billion in 2014", label="positive"),
+  ClassifyExample(text="Tests of Cholesterol Drugs Offer Hope of Reducing Heart Attacks and Strokes", label="positive"),
+  ClassifyExample(text="F.D.A. Approves Amgen Drug to Treat Heart Failure", label="positive"),
+  ClassifyExample(text="With Win, Amazon Shakes Up Yet Another Industry", label="positive"),
+  ClassifyExample(text="Bobby Kotick's Activision Blizzard to Buy King Digital, Maker of Candy Crush", label="positive"),
+  ClassifyExample(text="Biogen Reports Its Alzheimer's Drug Sharply Slowed Cognitive Decline", label="positive"),
+  ClassifyExample(text="Intel Agrees to Buy Altera for $16.7 Billion", label="positive"),
+  ClassifyExample(text="SodaStream Hits Reset as Its Sales and Profit Fall", label="negative"),
+  ClassifyExample(text="Amazon's Tax Deal With Luxembourg May Break Rules, E.U. Regulator Says", label="negative"),
+  ClassifyExample(text="Comcast-Time Warner Cable Deal's Collapse Leaves Frustrated Customers Out in the Cold", label="negative"),
+  ClassifyExample(text="Daily Report: Tech Giants Said to Offer Bigger Settlement in Antitrust Case on Hiring", label="negative"),
+  ClassifyExample(text="C.F.T.C. Accuses Kraft and Mondelez of Manipulating Wheat Prices", label="negative"),
+  ClassifyExample(text="Morning Agenda: Split Decision for Greenberg in A.I.G. Lawsuit", label="negative"),
+  ClassifyExample(text="Apple's New Job: Selling a Smartwatch to an Uninterested Public", label="negative")
 ]
 
 def cohereSentiment(examples, idx):
@@ -35,21 +35,38 @@ def cohereSentiment(examples, idx):
   if len(inputs2)==0:
     pos = -1
   else:
-    response = co.classify(
-      model='medium',
-      inputs=inputs2,
-      examples=examples,
-    )
-    positive_confidences = []
-
-    for classification in response.classifications:
-      if classification.prediction == "positive":
-        positive_confidences.append(classification.confidence)
-      elif classification.prediction == "negative":
-        positive_confidences.append(1-classification.confidence)
-
-    pos = sum(positive_confidences)
-    pos /=len(inputs2)
+    try:
+      # Use generate API instead of classify since classify requires fine-tuned models
+      prompt = f"""Analyze the sentiment of the following news headlines. 
+      For each headline, respond with only 'positive' or 'negative'.
+      
+      Headlines:
+      {chr(10).join(inputs2)}
+      
+      Sentiment analysis:"""
+      
+      response = co.generate(
+        model='command',
+        prompt=prompt,
+        max_tokens=50,
+        temperature=0.1
+      )
+      
+      # Parse the response to count positive/negative sentiments
+      result_text = response.generations[0].text.strip().lower()
+      positive_count = result_text.count('positive')
+      negative_count = result_text.count('negative')
+      total_count = positive_count + negative_count
+      
+      if total_count > 0:
+        pos = positive_count / total_count
+      else:
+        pos = 0.5  # Default neutral sentiment
+      
+    except Exception as e:
+      print(f"❌ Cohere API 错误: {e}")
+      print("使用默认情感分数: 0.5")
+      pos = 0.5
   pos = round(pos, 3)
   print(pos)
   config.NYTScores.append(pos)

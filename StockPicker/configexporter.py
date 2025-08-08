@@ -96,14 +96,20 @@ def sumScore():
         localNYTScoresFile = json.load(json_file)
     localNYTScores = json.loads(localNYTScoresFile)
     
+    print(f"搜索分数: {localSearchScores}")
+    print(f"NYT分数: {localNYTScores}")
+    
     for idx, x in enumerate(localSearchScores):
         score = -1
-        if (localNYTScores[idx] != -1 and x != 0):
+        # Check if we have valid scores for both search and NYT
+        if (localNYTScores[idx] != -1 and x > 0):
             score = localNYTScores[idx] - x
-        # else:
-        #     print("stock had error, don't pick: " + str(idx))
+            print(f"股票 {idx}: NYT={localNYTScores[idx]}, 搜索={x}, 最终={score}")
+        else:
+            print(f"股票 {idx}: 跳过 (NYT={localNYTScores[idx]}, 搜索={x})")
         config.finalScores.append(score)
     
+    print(f"最终分数: {config.finalScores}")
     exportFinalScores()
 
 def exportPortfolioResults(tickers):

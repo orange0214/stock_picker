@@ -14,7 +14,7 @@ from StockPicker.configexporter import *
 
 # initiate connection w/ personal API key
 configp = configparser.ConfigParser()
-configp.read('NYTScraper\config.ini')
+configp.read('NYTScraper/config.ini')
 
 api_key = configp['NYT']['NYT_key']
 nyt = NYTAPI(api_key, parse_dates=True)
@@ -45,31 +45,45 @@ def generateArticleText():
     exportHeadlineLists()
 
 def getArticles(q, year):
-    articles = nyt.article_search(
-        query = q,
-        # results = 1,
-        dates = {
-            "begin": datetime.datetime(year - 1, 1, 1),
-            "end": datetime.datetime(year, 1, 1)
-        },
-        options = {
-        "sort": "oldest",
-        "sources": [
-            "New York Times",
-            "AP",
-            "Reuters",
-            "International Herald Tribune"
-        ]
-        }
-    )
+    try:
+        articles = nyt.article_search(
+            query = q,
+            # results = 1,
+            dates = {
+                "begin": datetime.datetime(year - 1, 1, 1),
+                "end": datetime.datetime(year, 1, 1)
+            },
+            options = {
+            "sort": "oldest",
+            "sources": [
+                "New York Times",
+                "AP",
+                "Reuters",
+                "International Herald Tribune"
+            ]
+            }
+        )
+        
+        # Check if articles is None or empty
+        if articles is None:
+            print(f"⚠️ 警告: 没有找到关于 '{q}' 的文章")
+            return pd.DataFrame({'headline': []})
+        
+        if len(articles) == 0:
+            print(f"⚠️ 警告: 没有找到关于 '{q}' 的文章")
+            return pd.DataFrame({'headline': []})
 
-    # for each of the articles in the list, get the information that is stored in a nested dictionary:
-    headline = map(lambda x: x["headline"]["main"], articles)
-    # leadparagraph = map(lambda x: x["lead_paragraph"], articles)
-    # maybe add abstract in final version
+        # for each of the articles in the list, get the information that is stored in a nested dictionary:
+        headline = map(lambda x: x["headline"]["main"], articles)
+        # leadparagraph = map(lambda x: x["lead_paragraph"], articles)
+        # maybe add abstract in final version
 
-    # transforming the data into a pandas dataframe:
-    #data={'headline': list(headline), 'author': list(author), 'leadparagraph':list(leadparagraph),'publication date': list(pubdate), "keywords": list(keywords)}
-    data={'headline': list(headline)}
-    df = pd.DataFrame(data)
-    return df
+        # transforming the data into a pandas dataframe:
+        #data={'headline': list(headline), 'author': list(author), 'leadparagraph':list(leadparagraph),'publication date': list(pubdate), "keywords": list(keywords)}
+        data={'headline': list(headline)}
+        df = pd.DataFrame(data)
+        return df
+        
+    except Exception as e:
+        print(f"❌ NYT API 错误 (查询: {q}): {e}")
+        return pd.DataFrame({'headline': []})

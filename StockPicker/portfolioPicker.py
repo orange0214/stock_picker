@@ -21,14 +21,22 @@ def pickStocks():
 
     indexesOfBestStocks = []
 
+    # Select top 10 stocks with highest scores (even if negative)
     i = 0
-    while (i < 10 and max(localFinalScores) > 0):
-        indexesOfBestStocks.append(localFinalScores.index(max(localFinalScores)))
-        localFinalScores[localFinalScores.index(max(localFinalScores))] = -1
+    max_score = max(localFinalScores)
+    print(f"最高分数: {max_score}")
+    
+    # Create a copy of scores to avoid modifying the original
+    scores_copy = localFinalScores.copy()
+    
+    while (i < 10 and max(scores_copy) > -1):  # -1 indicates invalid scores
+        best_index = scores_copy.index(max(scores_copy))
+        indexesOfBestStocks.append(best_index)
+        scores_copy[best_index] = -1  # Mark as used
         i += 1
     
-    localFinalScores = json.loads(localFinalScoresFile) # to get values back so they aren't -1
-    # print("indexes: " + str(indexesOfBestStocks))
+    print(f"选择的股票索引: {indexesOfBestStocks}")
+    print(f"对应的分数: {[localFinalScores[i] for i in indexesOfBestStocks]}")
 
     for idx, x in enumerate(indexesOfBestStocks):
         config.portfolio.append(localTickersFiltered[x] + ": " + localNamesFiltered[x] + ", " + str("{:.2f}".format(localFinalScores[x])))

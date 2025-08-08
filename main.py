@@ -6,7 +6,7 @@ from GoogleScraper.googlescraper import *
 from GoogleScraper.tickerparser import *
 from StockPicker.configexporter import *
 from StockPicker.portfolioPicker import *
-from NYTScraper.mainNYT import *
+from NYTScraper.MainNYT import *
 from NYTScraper.cohereSentiment import *
 from Backtester.mainBacktester import *
 

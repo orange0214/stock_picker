@@ -2,14 +2,16 @@ B2 Portfolio Results
 From January 1, 2009 to December 31, 2022
 Starting with $10,000 invested into each stock: 
 
-FISV: $128730.71
-HOLX: $66013.57
-TEVA: $2538.00
-ORCL: $50897.21
-ADBE: $172320.05
-AAPL: $402680.50
-EBAY: $89169.18
-MSFT: $131538.00
+BBBY: $nan
+BIDU: $104589.57
+CMCSA: $70390.90
+EBAY: $103792.52
+EXPE: $97167.24
+GOOGL: $116670.50
+KLAC: $344274.92
+LAMR: $176639.32
+VRSN: $132980.77
+VRTX: $97760.97
 
-Final Portfolio Value: From $100,000 to $1043887.22
-Percentage Gain/Loss: 1033.89%
+Final Portfolio Value: From $100,000 to $nan
+Percentage Gain/Loss: nan%
